@@ -44,19 +44,50 @@ We use [goreleaser](https://goreleaser.com) to automate cross-platform builds, a
    ```bash
    brew install goreleaser/tap/goreleaser
    ```
-2. Commit any changes and create a version tag:
+2. Commit any changes, tag the new release, and push to GitHub:
    ```bash
-   git tag vX.Y.Z
-   git push origin vX.Y.Z
+   # switch to main branch and update
+   git checkout main
+   git pull origin main
+
+   # commit any pending changes (e.g., version bump, changelog)
+   git add .
+   git commit -m "chore: release vX.Y.Z"
+
+   # create an annotated tag for the release
+   git tag -a vX.Y.Z -m "Release vX.Y.Z"
+
+   # push commits and tags
+   git push origin main --tags
    ```
 3. Run goreleaser:
    ```bash
-   goreleaser release --rm-dist
+   goreleaser release --clean --config dist/config.yaml
    ```
 
 This will build all targets defined in `dist/config.yaml`, generate archives, checksums, and publish a GitHub Release.
 
 For snapshot builds (local, no publish):
 ```bash
-goreleaser release --snapshot --skip-publish --rm-dist
+goreleaser release --snapshot --clean --config dist/config.yaml
+```
+
+### Homebrew Tap
+
+We maintain a Homebrew tap in this repository under the `Formula/` directory. On each release, Goreleaser will update the Homebrew formula and push it back to this repo.
+
+To tap and install Homebrew formula:
+```bash
+brew tap Leathal1/greycli
+brew install greycli
+```
+
+### Scoop Bucket
+
+We maintain a Scoop bucket in the `scoop/` directory of this repository. On each release, GoReleaser will update the Scoop manifest and push it back.
+
+To add the bucket and install:
+```powershell
+scoop bucket add greycli https://github.com/Leathal1/greycli.git
+scoop install greycli
 ```
