@@ -1,0 +1,19 @@
+# .goreleaser.yaml
+project_name: greycli
+
+builds:
+  - main: ./cmd/main.go
+    goos: [darwin, linux, windows]
+    goarch: [amd64, arm64]
+
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: 'checksums.txt'
+
+release:
+  github:
+    owner: Leathal1
+    name: greycli
