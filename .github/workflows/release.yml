@@ -24,8 +24,7 @@ jobs:
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v5
         with:
-          version: latest
-          distribution: goreleaser-dist
+          version: v1.27.0
           args: release --clean --config dist/config.yaml
           workdir: .
         env:
