@@ -1,14 +1,17 @@
 package api
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
+   "encoding/json"
+   "fmt"
+   "io/ioutil"
+   "net/http"
 )
 
+// BaseURL is the HTTP base address for the API; override in tests as needed.
+var BaseURL = "http://localhost:8080"
+
 func FetchModels() ([]string, error) {
-	resp, err := http.Get("http://localhost:8080/models")
+	resp, err := http.Get(BaseURL + "/models")
 	if err != nil {
 		return nil, fmt.Errorf("get models: %w", err)
 	}

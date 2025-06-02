@@ -24,12 +24,13 @@ var submitCmd = &cobra.Command{
 			log.Fatalf("Missing required flags: --model and --image are required.")
 		}
 
-		jobID, err := api.SubmitJob(model, imagePath, redundancy)
+       // note: SubmitJob takes (imagePath, model, redundancy)
+		jobResp, err := api.SubmitJob(imagePath, model, redundancy)
 		if err != nil {
 			log.Fatalf("Submission failed: %v", err)
 		}
 
-		fmt.Printf("✅ Job submitted successfully!\nJob ID: %s\nModel: %s\nImage: %s\nRedundancy: %d\n", jobID, model, imagePath, redundancy)
+		fmt.Printf("✅ Job submitted successfully!\nJob ID: %s\nModel: %s\nImage: %s\nRedundancy: %d\n", jobResp.JobID, model, imagePath, redundancy)
 	},
 }
 

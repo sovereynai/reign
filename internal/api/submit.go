@@ -1,13 +1,14 @@
 package api
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
-	"os"
+   "bytes"
+   "encoding/json"
+   "fmt"
+   "io/ioutil"
+   "net/http"
+   "os"
 )
+
 
 type JobRequest struct {
 	Image      string `json:"image"`
@@ -37,7 +38,7 @@ func SubmitJob(imagePath, model string, redundancy int) (*JobResponse, error) {
 		return nil, fmt.Errorf("marshal job: %w", err)
 	}
 
-	resp, err := http.Post("http://localhost:8080/jobs", "application/json", bytes.NewReader(body))
+	resp, err := http.Post(BaseURL+"/jobs", "application/json", bytes.NewReader(body))
 	if err != nil {
 		return nil, fmt.Errorf("post job: %w", err)
 	}

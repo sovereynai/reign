@@ -1,14 +1,15 @@
 package api
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
+   "encoding/json"
+   "fmt"
+   "io/ioutil"
+   "net/http"
 )
 
+
 func FetchCredits() (int, error) {
-	resp, err := http.Get("http://localhost:8080/credits")
+	resp, err := http.Get(BaseURL + "/credits")
 	if err != nil {
 		return 0, fmt.Errorf("failed to fetch credits: %w", err)
 	}

@@ -1,11 +1,12 @@
 package api
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
+   "encoding/json"
+   "fmt"
+   "io/ioutil"
+   "net/http"
 )
+
 
 type Job struct {
 	ID     string `json:"id"`
@@ -14,7 +15,7 @@ type Job struct {
 }
 
 func FetchJobs() ([]Job, error) {
-	resp, err := http.Get("http://localhost:8080/jobs")
+	resp, err := http.Get(BaseURL + "/jobs")
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch jobs: %w", err)
 	}
