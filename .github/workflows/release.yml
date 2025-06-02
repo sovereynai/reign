@@ -22,10 +22,8 @@ jobs:
           go-version: '1.18'
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v5
-        with:
-          version: latest
-          args: release --clean --config dist/config.yaml
-          workdir: .
+        run: |
+          go install github.com/goreleaser/goreleaser@latest
+          goreleaser release --clean --config dist/config.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
