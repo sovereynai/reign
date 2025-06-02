@@ -1,25 +1,25 @@
- # GoReleaser-based release workflow
- name: Release
+# GoReleaser-based release workflow
+name: Release
 
- on:
-   push:
-     # Trigger on semantic version tags like v1.2.3
-     tags:
-       - 'v*.*.*'
+on:
+  push:
+    # Trigger on semantic version tags like v1.2.3
+    tags:
+      - 'v*.*.*'
 
- jobs:
-   release:
-     runs-on: ubuntu-latest
-     steps:
-       - name: Checkout code
-         uses: actions/checkout@v3
-         with:
-           fetch-depth: 0  # fetch all tags
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # fetch all tags
 
-       - name: Set up Go
-         uses: actions/setup-go@v4
-         with:
-           go-version: '1.18'
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.18'
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v5
