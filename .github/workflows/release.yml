@@ -1,5 +1,8 @@
 # GoReleaser-based release workflow
 name: Release
+permissions:
+  contents: write
+  packages: write
 
 on:
   push:
