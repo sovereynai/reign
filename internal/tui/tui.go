@@ -12,8 +12,15 @@ import (
 func NewModelsView() *tview.List {
 	modelList := tview.NewList()
 	modelList.ShowSecondaryText(false)
-	modelList.SetBorder(true)
-	modelList.SetTitle("Models")
+   // Styling
+   modelList.SetBorder(true).
+       SetBorderColor(tcell.ColorWhite).
+       SetTitle("Models").
+       SetTitleColor(tcell.ColorWhite)
+   modelList.SetMainTextColor(tcell.ColorWhite)
+   modelList.SetSelectedTextColor(tcell.ColorBlack)
+   modelList.SetSelectedBackgroundColor(tcell.ColorLime)
+   modelList.SetHighlightFullLine(true)
 
 	models, err := api.FetchModels()
 	if err != nil {
@@ -33,9 +40,11 @@ func NewModelsView() *tview.List {
 // NewCreditsView creates a TextView with a loading spinner while fetching credits.
 func NewCreditsView(app *tview.Application) *tview.TextView {
    creditsView := tview.NewTextView()
-   creditsView.SetBorder(true)
-   creditsView.SetTitle("Credit Tracker")
-   creditsView.SetTextColor(tcell.ColorYellow)
+   creditsView.SetBorder(true).
+       SetBorderColor(tcell.ColorWhite).
+       SetTitle("Credits").
+       SetTitleColor(tcell.ColorWhite)
+   creditsView.SetTextColor(tcell.ColorWhite)
 
    // Spinner setup
    spinner := []rune{'|', '/', '-', '\\'}
@@ -81,13 +90,20 @@ func NewCreditsView(app *tview.Application) *tview.TextView {
 func NewJobsView() *tview.Table {
    table := tview.NewTable()
    table.SetBorders(false)
-   table.SetTitle("Jobs")
-   table.SetBorder(true)
+   table.SetBorder(true).
+       SetBorderColor(tcell.ColorWhite).
+       SetTitle("Jobs").
+       SetTitleColor(tcell.ColorWhite)
+   // Make selectable and header fixed
+   table.SetSelectable(true, false)
+   table.SetFixed(1, 0)
+   table.SetSelectedStyle(tcell.StyleDefault.Background(tcell.ColorLime).Foreground(tcell.ColorBlack))
 
    // Header row
-   table.SetCell(0, 0, tview.NewTableCell("ID").SetTextColor(tcell.ColorGreen).SetSelectable(false))
-   table.SetCell(0, 1, tview.NewTableCell("Model").SetTextColor(tcell.ColorGreen).SetSelectable(false))
-   table.SetCell(0, 2, tview.NewTableCell("Status").SetTextColor(tcell.ColorGreen).SetSelectable(false))
+   headerColor := tcell.ColorLime
+   table.SetCell(0, 0, tview.NewTableCell("ID").SetTextColor(headerColor).SetSelectable(false))
+   table.SetCell(0, 1, tview.NewTableCell("Model").SetTextColor(headerColor).SetSelectable(false))
+   table.SetCell(0, 2, tview.NewTableCell("Status").SetTextColor(headerColor).SetSelectable(false))
 
    // Fetch jobs (errors are silently ignored, showing header only)
    jobs, err := api.FetchJobs()
@@ -97,9 +113,10 @@ func NewJobsView() *tview.Table {
 
    // Populate rows
    for i, job := range jobs {
-       table.SetCell(i+1, 0, tview.NewTableCell(job.ID))
-       table.SetCell(i+1, 1, tview.NewTableCell(job.Model))
-       table.SetCell(i+1, 2, tview.NewTableCell(job.Status))
+       row := i + 1
+       table.SetCell(row, 0, tview.NewTableCell(job.ID).SetTextColor(tcell.ColorWhite))
+       table.SetCell(row, 1, tview.NewTableCell(job.Model).SetTextColor(tcell.ColorWhite))
+       table.SetCell(row, 2, tview.NewTableCell(job.Status).SetTextColor(tcell.ColorWhite))
    }
    return table
 }
