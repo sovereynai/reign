@@ -9,6 +9,7 @@ import (
 	"github.com/sovereynai/reign/internal/bootstrap"
 	"github.com/sovereynai/reign/internal/client"
 	"github.com/sovereynai/reign/internal/config"
+	"github.com/sovereynai/reign/internal/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -77,14 +78,81 @@ func main() {
 		RunE:  runModels,
 	}
 
-	// Status command
+	// Status command (enhanced)
 	statusCmd := &cobra.Command{
 		Use:   "status",
-		Short: "Show throne daemon status",
+		Short: "Show comprehensive dashboard (auto-detects role)",
 		RunE:  runStatus,
 	}
 
-	rootCmd.AddCommand(versionCmd, chatCmd, modelsCmd, statusCmd)
+	// Dev subcommand
+	devCmd := &cobra.Command{
+		Use:   "dev",
+		Short: "AI Developer commands and dashboard",
+	}
+	devStatusCmd := &cobra.Command{
+		Use:   "status",
+		Short: "Show AI Developer dashboard",
+		RunE:  runDevStatus,
+	}
+	devHistoryCmd := &cobra.Command{
+		Use:   "history",
+		Short: "View request history (coming soon)",
+		RunE:  runComingSoon,
+	}
+	devOptimizeCmd := &cobra.Command{
+		Use:   "optimize",
+		Short: "Get cost optimization suggestions (coming soon)",
+		RunE:  runComingSoon,
+	}
+	devPlaygroundCmd := &cobra.Command{
+		Use:   "playground",
+		Short: "Interactive model testing (coming soon)",
+		RunE:  runComingSoon,
+	}
+	devCmd.AddCommand(devStatusCmd, devHistoryCmd, devOptimizeCmd, devPlaygroundCmd)
+
+	// Node subcommand
+	nodeCmd := &cobra.Command{
+		Use:   "node",
+		Short: "Node Operator commands and dashboard",
+	}
+	nodeStatusCmd := &cobra.Command{
+		Use:   "status",
+		Short: "Show Node Operator dashboard",
+		RunE:  runNodeStatus,
+	}
+	nodeEarningsCmd := &cobra.Command{
+		Use:   "earnings",
+		Short: "Detailed revenue breakdown (coming soon)",
+		RunE:  runComingSoon,
+	}
+	nodeOptimizeCmd := &cobra.Command{
+		Use:   "optimize",
+		Short: "Hardware optimization suggestions (coming soon)",
+		RunE:  runComingSoon,
+	}
+	nodeModelsCmd := &cobra.Command{
+		Use:   "models",
+		Short: "Manage models based on demand (coming soon)",
+		RunE:  runComingSoon,
+	}
+	nodePeersCmd := &cobra.Command{
+		Use:   "peers",
+		Short: "Network connections & health (coming soon)",
+		RunE:  runComingSoon,
+	}
+	nodeLogsCmd := &cobra.Command{
+		Use:   "logs",
+		Short: "Real-time inference logs (coming soon)",
+		RunE:  runComingSoon,
+	}
+	nodeCmd.AddCommand(nodeStatusCmd, nodeEarningsCmd, nodeOptimizeCmd, nodeModelsCmd, nodePeersCmd, nodeLogsCmd)
+
+	// Demo command (hidden, for testing)
+	demoCmd := createDemoCommand()
+
+	rootCmd.AddCommand(versionCmd, chatCmd, modelsCmd, statusCmd, devCmd, nodeCmd, demoCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, errorStyle.Render("Error: "+err.Error()))
@@ -183,6 +251,76 @@ func runStatus(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	stats, err := c.GetDashboardStats()
+	if err != nil {
+		// Fallback to simple status if dashboard endpoint not available
+		return runSimpleStatus(c)
+	}
+
+	// Auto-detect role and show appropriate dashboard
+	switch stats.Role {
+	case "developer":
+		fmt.Println(ui.RenderDeveloperDashboard(stats))
+	case "operator":
+		fmt.Println(ui.RenderOperatorDashboard(stats))
+	case "both":
+		// Show both dashboards
+		fmt.Println(ui.RenderDeveloperDashboard(stats))
+		fmt.Println()
+		fmt.Println(ui.RenderOperatorDashboard(stats))
+	default:
+		return runSimpleStatus(c)
+	}
+
+	return nil
+}
+
+func runDevStatus(cmd *cobra.Command, args []string) error {
+	c, err := getThroneClient()
+	if err != nil {
+		return err
+	}
+
+	stats, err := c.GetDashboardStats()
+	if err != nil {
+		return fmt.Errorf("failed to get dashboard stats: %w", err)
+	}
+
+	if stats.Developer == nil {
+		return fmt.Errorf("no developer stats available - have you made any inference requests?")
+	}
+
+	fmt.Println(ui.RenderDeveloperDashboard(stats))
+	return nil
+}
+
+func runNodeStatus(cmd *cobra.Command, args []string) error {
+	c, err := getThroneClient()
+	if err != nil {
+		return err
+	}
+
+	stats, err := c.GetDashboardStats()
+	if err != nil {
+		return fmt.Errorf("failed to get dashboard stats: %w", err)
+	}
+
+	if stats.Operator == nil {
+		return fmt.Errorf("no operator stats available - is this node serving models?")
+	}
+
+	fmt.Println(ui.RenderOperatorDashboard(stats))
+	return nil
+}
+
+func runComingSoon(cmd *cobra.Command, args []string) error {
+	fmt.Println(infoStyle.Render("🚧 Coming soon!"))
+	fmt.Println("This feature is under active development.")
+	return nil
+}
+
+// Fallback for older throne versions without dashboard endpoint
+func runSimpleStatus(c *client.ThroneClient) error {
 	if err := c.Health(); err != nil {
 		fmt.Println(errorStyle.Render("❌ Throne daemon: OFFLINE"))
 		return err
@@ -204,6 +342,9 @@ func runStatus(cmd *cobra.Command, args []string) error {
 		fmt.Println()
 		fmt.Println(infoStyle.Render("📦 Models:  ") + fmt.Sprintf("%d available", len(models)))
 	}
+
+	fmt.Println()
+	fmt.Println(infoStyle.Render("💡 Tip: Upgrade throne for rich dashboards with detailed metrics"))
 
 	return nil
 }

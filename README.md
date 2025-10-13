@@ -7,8 +7,10 @@ Reign is the user-friendly command-line interface for interacting with the Sover
 ## ✨ Features
 
 - 🤖 **Chat with AI models** - Submit inference jobs with beautiful output
+- 📊 **Dual Dashboards** - Rich, information-dense views for AI Devs and Node Operators
+- 📈 **Real-time Metrics** - Track credits, earnings, performance, and hardware
+- 💡 **Smart Insights** - AI-powered optimization recommendations
 - 📦 **Model management** - List and pull Ollama models
-- 📊 **Network monitoring** - Check daemon status and health
 - 🎨 **Beautiful TUI** - Rich terminal UI with colors and formatting
 - ⚡ **Zero configuration** - Auto-discovers local throne daemon
 
@@ -43,15 +45,58 @@ go build -o reign ./cmd/reign
 
 ## 📖 Usage
 
-### Chat with AI
+### 👨‍💻 For AI Developers
 
 ```bash
-# Simple chat
-reign chat "Explain quantum computing in one sentence"
+# View your developer dashboard
+reign dev status
 
-# Specify model
+# Smart dashboard auto-detects your role
+reign status
+
+# Chat with AI models
+reign chat "Explain quantum computing in one sentence"
 reign chat -m llama3.2:latest "Write a haiku about recursion"
+
+# Coming soon
+reign dev history     # View request history & replay
+reign dev optimize    # Get cost reduction suggestions
+reign dev playground  # Interactive model testing
 ```
+
+**Developer Dashboard shows:**
+- 💰 Credit balance, burn rate, and runway
+- 🤖 Per-model inference metrics
+- ⚡ Latency percentiles (p50, p95, p99)
+- 📊 Success rates and failures
+- 🎯 Smart optimization insights
+- 🌍 Network health and queue depth
+
+### 🖥️ For Node Operators
+
+```bash
+# View your operator dashboard
+reign node status
+
+# See earnings and hardware stats
+reign status
+
+# Coming soon
+reign node earnings   # Detailed revenue breakdown
+reign node optimize   # Hardware tuning recommendations
+reign node models     # Add/remove models based on demand
+reign node peers      # Network connections & health
+reign node logs       # Real-time inference log stream
+```
+
+**Operator Dashboard shows:**
+- 💰 Earnings (today, week, all-time) with trends
+- 📈 Revenue breakdown (inference, bandwidth, storage, bonuses)
+- 🔥 Workload stats (requests, success rate, peak hours)
+- 🖥️ Hardware utilization (GPU, CPU, RAM, disk, temps)
+- 📦 Model performance (requests, latency, revenue per model)
+- 🌍 Network participation and reputation score
+- ⚠️ Alerts and optimization suggestions
 
 ### Model Management
 
@@ -63,10 +108,10 @@ reign models
 reign models pull llama3.2:latest
 ```
 
-### Status & Monitoring
+### Status & Version
 
 ```bash
-# Check throne daemon status
+# Smart status (auto-detects role)
 reign status
 
 # Show version info
@@ -104,7 +149,8 @@ reign/
 ├── internal/
 │   ├── client/          # HTTP client for throne API
 │   ├── config/          # Config & daemon discovery
-│   └── ui/              # TUI components (future)
+│   ├── ui/              # Rich dashboard rendering
+│   └── bootstrap/       # First-run setup
 └── README.md
 ```
 
@@ -136,11 +182,13 @@ Reign is open source! We welcome contributions:
 3. Submit a pull request
 
 **Ideas for contributions:**
-- Additional commands (`reign logs`, `reign network`)
-- Enhanced TUI with progress bars and spinners
+- Streaming chat output with real-time progress
+- Session history and conversation replay
+- Interactive model playground
+- Hardware monitoring enhancements
 - Shell completions
 - Config file support
-- Interactive mode
+- Export metrics to JSON/CSV
 
 ## 📚 API Reference
 
@@ -153,7 +201,7 @@ Reign communicates with throne's HTTP API:
 | `/chat` | POST | Chat completion |
 | `/generate` | POST | Text generation |
 | `/ollama/models` | GET | List models |
-| `/credits` | GET | Credit balance |
+| `/stats/dashboard` | GET | Comprehensive dashboard statistics |
 
 See throne's API documentation for full details.
 
