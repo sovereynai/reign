@@ -135,6 +135,7 @@ type EarningsStats struct {
 	WeekTrend       float64 `json:"week_trend"`
 	AllTime         float64 `json:"all_time"`
 	Pending         float64 `json:"pending"`
+	Held            float64 `json:"held"` // Amount held for security/escrow
 	Rank            int     `json:"rank"`
 	TotalNodes      int     `json:"total_nodes"`
 	Breakdown       EarningsBreakdown `json:"breakdown"`

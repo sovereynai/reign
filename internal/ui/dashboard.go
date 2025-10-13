@@ -281,7 +281,7 @@ func renderEarnings(e *client.EarningsStats) string {
 		trendColor = errorStyle
 	}
 
-	return fmt.Sprintf("  %s        %s    %s\n  %s    %s    %s\n  %s     %s    %s\n  %s      %s      %s\n  %s         %s\n",
+	return fmt.Sprintf("  %s        %s    %s\n  %s    %s    %s\n  %s     %s    %s\n  %s      %s      %s\n  %s        %s      %s\n  %s         %s\n",
 		labelStyle.Render("Today:"),
 		valueStyle.Render(fmt.Sprintf("+%.1f credits", e.Today)),
 		mutedStyle.Render(fmt.Sprintf("(Est: $%.2f USD)", e.TodayUSD)),
@@ -294,6 +294,9 @@ func renderEarnings(e *client.EarningsStats) string {
 		labelStyle.Render("Pending:"),
 		valueStyle.Render(fmt.Sprintf("%.1f credits", e.Pending)),
 		mutedStyle.Render("(settlement in ~2h)"),
+		labelStyle.Render("Held:"),
+		valueStyle.Render(fmt.Sprintf("%.1f credits", e.Held)),
+		mutedStyle.Render("(security deposit)"),
 		labelStyle.Render("Rank:"),
 		valueStyle.Render(fmt.Sprintf("#%d / %d nodes globally", e.Rank, e.TotalNodes)),
 	)
