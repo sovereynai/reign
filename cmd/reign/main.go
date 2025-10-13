@@ -183,7 +183,7 @@ func runVersion(cmd *cobra.Command, args []string) error {
 	fmt.Println(infoStyle.Render("Daemon Version:  ") + version.Version)
 	fmt.Println(infoStyle.Render("Commit:          ") + version.Commit[:8])
 	fmt.Println(infoStyle.Render("Build Time:      ") + version.BuildTime)
-	fmt.Println(infoStyle.Render("CLI Version:     ") + "v0.2.0")
+	fmt.Println(infoStyle.Render("CLI Version:     ") + "v0.2.1")
 
 	return nil
 }
