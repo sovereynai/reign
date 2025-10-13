@@ -77,6 +77,18 @@ func main() {
 		Short: "List available models",
 		RunE:  runModels,
 	}
+	modelsNetworkCmd := &cobra.Command{
+		Use:   "network",
+		Short: "List all models available across the network",
+		RunE:  runModelsNetwork,
+	}
+	modelsLocateCmd := &cobra.Command{
+		Use:   "locate [model]",
+		Short: "Find where a specific model is available",
+		Args:  cobra.MinimumNArgs(1),
+		RunE:  runModelsLocate,
+	}
+	modelsCmd.AddCommand(modelsNetworkCmd, modelsLocateCmd)
 
 	// Status command (enhanced)
 	statusCmd := &cobra.Command{
@@ -237,9 +249,83 @@ func runModels(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to list models: %w", err)
 	}
 
-	fmt.Println(titleStyle.Render("📦 Available Models"))
+	fmt.Println(titleStyle.Render("📦 Local Models"))
 	for _, model := range models {
 		fmt.Println(successStyle.Render("  • ") + model)
+	}
+
+	return nil
+}
+
+func runModelsNetwork(cmd *cobra.Command, args []string) error {
+	c, err := getThroneClient()
+	if err != nil {
+		return err
+	}
+
+	models, err := c.ListNetworkModels()
+	if err != nil {
+		return fmt.Errorf("failed to list network models: %w", err)
+	}
+
+	fmt.Println(titleStyle.Render("🌍 Network Models"))
+	fmt.Println()
+
+	if len(models) == 0 {
+		fmt.Println(infoStyle.Render("No models found on the network"))
+		return nil
+	}
+
+	for _, model := range models {
+		locationStr := fmt.Sprintf("%d location(s)", model.PeerCount)
+		fmt.Printf("%s %s\n", successStyle.Render("  • "+model.Name), infoStyle.Render(locationStr))
+		for _, loc := range model.Locations {
+			if loc == "local" {
+				fmt.Println(infoStyle.Render("      - Local (this node)"))
+			} else {
+				fmt.Println(infoStyle.Render(fmt.Sprintf("      - Node: %s", loc)))
+			}
+		}
+	}
+
+	return nil
+}
+
+func runModelsLocate(cmd *cobra.Command, args []string) error {
+	modelName := args[0]
+
+	c, err := getThroneClient()
+	if err != nil {
+		return err
+	}
+
+	locations, err := c.LocateModel(modelName)
+	if err != nil {
+		return fmt.Errorf("failed to locate model: %w", err)
+	}
+
+	fmt.Println(titleStyle.Render(fmt.Sprintf("📍 Locations for %s", modelName)))
+	fmt.Println()
+
+	if len(locations) == 0 {
+		fmt.Println(errorStyle.Render("Model not found on the network"))
+		return nil
+	}
+
+	for _, loc := range locations {
+		nodeID := loc["node_id"].(string)
+		locType := loc["type"].(string)
+
+		if locType == "local" {
+			fmt.Println(successStyle.Render("  ✓ Local (this node)"))
+			fmt.Println(infoStyle.Render(fmt.Sprintf("    URL: %s", loc["url"])))
+		} else {
+			fmt.Println(successStyle.Render(fmt.Sprintf("  ✓ Remote node: %s", nodeID)))
+			fmt.Println(infoStyle.Render(fmt.Sprintf("    URL: %s", loc["url"])))
+			if latency, ok := loc["latency_ms"]; ok && latency.(float64) > 0 {
+				fmt.Println(infoStyle.Render(fmt.Sprintf("    Latency: %.0fms", latency)))
+			}
+		}
 	}
 
 	return nil

@@ -307,3 +307,55 @@ func (c *ThroneClient) GetDashboardStats() (*DashboardStats, error) {
 
 	return &stats, nil
 }
+
+// NetworkModel represents a model available on the network
+type NetworkModel struct {
+	Name        string   `json:"name"`
+	Locations   []string `json:"locations"`
+	PeerCount   int      `json:"peer_count"`
+	TotalSize   string   `json:"total_size"`
+	LastUpdated string   `json:"last_updated"`
+}
+
+// ListNetworkModels fetches all models available across the network
+func (c *ThroneClient) ListNetworkModels() ([]NetworkModel, error) {
+	resp, err := c.client.Get(c.BaseURL + "/network/models")
+	if err != nil {
+		return nil, fmt.Errorf("failed to get network models: %w", err)
+	}
+	defer resp.Body.Close()
+
+	var models []NetworkModel
+	if err := json.NewDecoder(resp.Body).Decode(&models); err != nil {
+		return nil, fmt.Errorf("failed to decode network models: %w", err)
+	}
+
+	return models, nil
+}
+
+// LocateModel finds where a specific model is available
+func (c *ThroneClient) LocateModel(modelName string) ([]map[string]interface{}, error) {
+	url := fmt.Sprintf("%s/network/models/locate?model=%s", c.BaseURL, modelName)
+	resp, err := c.client.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("failed to locate model: %w", err)
+	}
+	defer resp.Body.Close()
+
+	var result map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("failed to decode location response: %w", err)
+	}
+
+	locations, ok := result["locations"].([]interface{})
+	if !ok {
+		return []map[string]interface{}{}, nil
+	}
+
+	locs := make([]map[string]interface{}, len(locations))
+	for i, loc := range locations {
+		locs[i] = loc.(map[string]interface{})
+	}
+
+	return locs, nil
+}
