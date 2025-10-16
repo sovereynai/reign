@@ -159,12 +159,22 @@ func main() {
 		Short: "Real-time inference logs (coming soon)",
 		RunE:  runComingSoon,
 	}
-	nodeCmd.AddCommand(nodeStatusCmd, nodeEarningsCmd, nodeOptimizeCmd, nodeModelsCmd, nodePeersCmd, nodeLogsCmd)
+	nodeJobsCmd := &cobra.Command{
+		Use:   "jobs",
+		Short: "View live inference jobs with progress bars",
+		Run: func(cmd *cobra.Command, args []string) {
+			if err := ui.ShowLiveJobs(); err != nil {
+				fmt.Println(errorStyle.Render("❌ Live jobs viewer requires a terminal (TTY)"))
+				fmt.Println(infoStyle.Render("💡 Tip: Use 'reign node status' for a snapshot view"))
+			}
+		},
+	}
+	nodeCmd.AddCommand(nodeStatusCmd, nodeEarningsCmd, nodeOptimizeCmd, nodeModelsCmd, nodePeersCmd, nodeLogsCmd, nodeJobsCmd)
 
-	// Demo command (hidden, for testing)
-	demoCmd := createDemoCommand()
+	// Register jobs command (also available as top-level command)
+	RegisterJobsCommand(rootCmd)
 
-	rootCmd.AddCommand(versionCmd, chatCmd, modelsCmd, statusCmd, devCmd, nodeCmd, demoCmd)
+	rootCmd.AddCommand(versionCmd, chatCmd, modelsCmd, statusCmd, devCmd, nodeCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, errorStyle.Render("Error: "+err.Error()))
@@ -276,17 +286,111 @@ func runModelsNetwork(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
+	// Group by type
+	ollamaModels := []client.NetworkModel{}
+	onnxModels := []client.NetworkModel{}
 	for _, model := range models {
-		locationStr := fmt.Sprintf("%d location(s)", model.PeerCount)
-		fmt.Printf("%s %s\n", successStyle.Render("  • "+model.Name), infoStyle.Render(locationStr))
-		for _, loc := range model.Locations {
-			if loc == "local" {
-				fmt.Println(infoStyle.Render("      - Local (this node)"))
-			} else {
-				fmt.Println(infoStyle.Render(fmt.Sprintf("      - Node: %s", loc)))
-			}
+		if model.Type == client.ModelTypeOllama {
+			ollamaModels = append(ollamaModels, model)
+		} else {
+			onnxModels = append(onnxModels, model)
 		}
 	}
+
+	// Display Ollama models
+	if len(ollamaModels) > 0 {
+		fmt.Println(successStyle.Render(fmt.Sprintf("🤖 Ollama Models (%d)", len(ollamaModels))))
+		for _, model := range ollamaModels {
+			fmt.Printf("  %s %s\n",
+				successStyle.Render("• "+model.Name),
+				infoStyle.Render(fmt.Sprintf("(%s)", model.Category)))
+
+			trackerInfo := ""
+			if model.TrackerCount > 0 {
+				trackerInfo = fmt.Sprintf("%d tracker(s), ", model.TrackerCount)
+			}
+			fmt.Println(infoStyle.Render(fmt.Sprintf("    %s%d location(s)", trackerInfo, model.PeerCount)))
+
+			// Show tracker locations
+			trackers := []client.ModelLocation{}
+			remotes := []client.ModelLocation{}
+			var localLoc *client.ModelLocation
+
+			for _, loc := range model.Locations {
+				if loc.Type == "tracker" {
+					trackers = append(trackers, loc)
+				} else if loc.Type == "local" {
+					localLoc = &loc
+				} else {
+					remotes = append(remotes, loc)
+				}
+			}
+
+			if localLoc != nil {
+				fmt.Println(infoStyle.Render("      ✓ Local (this node)"))
+			}
+			for _, tracker := range trackers {
+				fmt.Println(infoStyle.Render(fmt.Sprintf("      📍 Tracker: %s", tracker.TrackerName)))
+			}
+			for _, remote := range remotes {
+				fmt.Println(infoStyle.Render(fmt.Sprintf("      🌐 Node: %s", remote.NodeID)))
+			}
+
+			if model.PullCommand != "" {
+				fmt.Println(infoStyle.Render(fmt.Sprintf("    💾 Pull: %s", model.PullCommand)))
+			}
+			fmt.Println()
+		}
+	}
+
+	// Display ONNX models
+	if len(onnxModels) > 0 {
+		fmt.Println(successStyle.Render(fmt.Sprintf("🔬 ONNX Models (%d)", len(onnxModels))))
+		for _, model := range onnxModels {
+			fmt.Printf("  %s %s\n",
+				successStyle.Render("• "+model.Name),
+				infoStyle.Render(fmt.Sprintf("(%s)", model.Category)))
+
+			trackerInfo := ""
+			if model.TrackerCount > 0 {
+				trackerInfo = fmt.Sprintf("%d tracker(s), ", model.TrackerCount)
+			}
+			fmt.Println(infoStyle.Render(fmt.Sprintf("    %s%d location(s)", trackerInfo, model.PeerCount)))
+
+			// Show tracker locations
+			trackers := []client.ModelLocation{}
+			remotes := []client.ModelLocation{}
+			var localLoc *client.ModelLocation
+
+			for _, loc := range model.Locations {
+				if loc.Type == "tracker" {
+					trackers = append(trackers, loc)
+				} else if loc.Type == "local" {
+					localLoc = &loc
+				} else {
+					remotes = append(remotes, loc)
+				}
+			}
+
+			if localLoc != nil {
+				fmt.Println(infoStyle.Render("      ✓ Local (this node)"))
+			}
+			for _, tracker := range trackers {
+				fmt.Println(infoStyle.Render(fmt.Sprintf("      📍 Tracker: %s", tracker.TrackerName)))
+			}
+			for _, remote := range remotes {
+				fmt.Println(infoStyle.Render(fmt.Sprintf("      🌐 Node: %s", remote.NodeID)))
+			}
+
+			if model.PullCommand != "" {
+				fmt.Println(infoStyle.Render(fmt.Sprintf("    💾 Pull: %s", model.PullCommand)))
+			}
+			fmt.Println()
+		}
+	}
+
+	fmt.Println(infoStyle.Render(fmt.Sprintf("Total: %d models (%d Ollama, %d ONNX)",
+		len(models), len(ollamaModels), len(onnxModels))))
 
 	return nil
 }
