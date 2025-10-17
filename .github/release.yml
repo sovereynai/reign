@@ -1,0 +1,8 @@
+# GitHub Release Configuration
+# This disables automatic changelog generation to protect implementation details
+
+changelog:
+  exclude:
+    labels:
+      - '*'
+  categories: []
