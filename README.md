@@ -1,227 +1,166 @@
 # 👑 Reign
 
-**The official CLI for Sovereyn's distributed intelligence network.**
+**Your terminal gateway to distributed AI.**
 
-Reign is the user-friendly command-line interface for interacting with the Sovereyn network. Submit AI inference jobs, manage models, and monitor network status—all from your terminal.
+Reign lets you run AI inference across a network of GPU nodes—without managing infrastructure, paying for idle time, or vendor lock-in. Get instant access to language models and vision AI from your command line.
 
-## ✨ Features
+## Why Reign?
 
-- 🤖 **Chat with AI models** - Submit inference jobs with beautiful output
-- 📊 **Dual Dashboards** - Rich, information-dense views for AI Devs and Node Operators
-- 📈 **Real-time Metrics** - Track credits, earnings, performance, and hardware
-- 💡 **Smart Insights** - AI-powered optimization recommendations
-- 📦 **Model management** - List and pull Ollama models
-- 🎨 **Beautiful TUI** - Rich terminal UI with colors and formatting
-- ⚡ **Zero configuration** - Auto-discovers local throne daemon
+### For AI Developers
+
+**Stop overpaying for idle GPU time.** Traditional cloud AI services charge you whether you're using them or not. With Reign, you only pay for actual inference—no monthly minimums, no idle charges.
+
+**Access models anywhere.** Browse and use AI models across the entire Sovereyn network. From powerful language models to specialized vision AI, find the right model for your task.
+
+**No vendor lock-in.** Open source CLI means you control your tools. Fork it, extend it, or swap it out. Your choice.
+
+**Simple as `reign chat`.** No complex SDKs, no API key juggling, no infrastructure management. Just install and run.
+
+## ✨ What You Get
+
+- 🤖 **Instant AI Access** - Chat with language models from your terminal
+- 🌍 **Network-Wide Discovery** - Browse 10+ models across all connected nodes
+- 📊 **Usage Insights** - Track your credits, burn rate, and performance metrics
+- 💡 **Smart Optimization** - Get recommendations to reduce costs
+- 📦 **Model Flexibility** - Use Ollama LLMs or ONNX vision models
+- ⚡ **Zero Setup** - Auto-discovers available models and services
+
+## 🆕 What's New
+
+- **Network Model Discovery** - See all available models across the network
+- **Vision AI Support** - Access computer vision models for image classification and detection
+- **Zero Configuration** - No environment variables or complex setup required
+- **Model Locations** - Find which nodes host the models you need
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-1. **Throne daemon running**:
-   ```bash
-   throne serve
-   ```
-
-2. **Ollama installed** (for LLM models):
-   ```bash
-   # macOS
-   brew install ollama
-   ollama serve
-
-   # Pull a model
-   ollama pull llama3.2:3b
-   ```
-
-### Installation
-
+**Install Ollama** (optional - for using local models):
 ```bash
-# Build from source
-go build -o reign ./cmd/reign
+# macOS
+brew install ollama
+ollama serve
+ollama pull llama3.2:3b
 
-# Run it
-./reign --help
+# Linux
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Windows
+# Download from https://ollama.com/download
 ```
 
-## 📖 Usage
-
-### 👨‍💻 For AI Developers
-
+**Install Throne** (connects you to the Sovereyn network):
 ```bash
-# View your developer dashboard
-reign dev status
-
-# Smart dashboard auto-detects your role
-reign status
-
-# Chat with AI models
-reign chat "Explain quantum computing in one sentence"
-reign chat -m llama3.2:latest "Write a haiku about recursion"
-
-# Coming soon
-reign dev history     # View request history & replay
-reign dev optimize    # Get cost reduction suggestions
-reign dev playground  # Interactive model testing
-```
-
-**Developer Dashboard shows:**
-- 💰 Credit balance, burn rate, and runway
-- 🤖 Per-model inference metrics
-- ⚡ Latency percentiles (p50, p95, p99)
-- 📊 Success rates and failures
-- 🎯 Smart optimization insights
-- 🌍 Network health and queue depth
-
-### 🖥️ For Node Operators
-
-```bash
-# View your operator dashboard
-reign node status
-
-# See earnings and hardware stats
-reign status
-
-# Coming soon
-reign node earnings   # Detailed revenue breakdown
-reign node optimize   # Hardware tuning recommendations
-reign node models     # Add/remove models based on demand
-reign node peers      # Network connections & health
-reign node logs       # Real-time inference log stream
-```
-
-**Operator Dashboard shows:**
-- 💰 Earnings (today, week, all-time) with trends
-- 📈 Revenue breakdown (inference, bandwidth, storage, bonuses)
-- 🔥 Workload stats (requests, success rate, peak hours)
-- 🖥️ Hardware utilization (GPU, CPU, RAM, disk, temps)
-- 📦 Model performance (requests, latency, revenue per model)
-- 🌍 Network participation and reputation score
-- ⚠️ Alerts and optimization suggestions
-
-### Model Management
-
-```bash
-# List available models
-reign models
-
-# Pull a new model (coming soon)
-reign models pull llama3.2:latest
-```
-
-### Status & Version
-
-```bash
-# Smart status (auto-detects role)
-reign status
-
-# Show version info
-reign version
-```
-
-## 🏗️ Architecture
-
-Reign is a **pure HTTP client** that communicates with the throne daemon:
-
-```
-┌─────────┐         ┌─────────┐         ┌────────┐
-│  Reign  │  HTTP   │ Throne  │  API    │ Ollama │
-│   CLI   ├────────>│ Daemon  ├────────>│  LLM   │
-└─────────┘         └─────────┘         └────────┘
-                          │
-                          ├──> Ledger (logging)
-                          ├──> Credits (tracking)
-                          └──> Network (p2p)
-```
-
-**Key Design:**
-- **Open Source** - Community-driven, forkable
-- **Zero Secrets** - No proprietary logic (that's in throne)
-- **Pure Client** - Just HTTP calls to throne's API
-- **Extensible** - Easy to add new commands
-
-## 🛠️ Development
-
-### Project Structure
-
-```
-reign/
-├── cmd/reign/           # Main CLI entry point
-├── internal/
-│   ├── client/          # HTTP client for throne API
-│   ├── config/          # Config & daemon discovery
-│   ├── ui/              # Rich dashboard rendering
-│   └── bootstrap/       # First-run setup
-└── README.md
-```
-
-### Building
-
-```bash
-go mod tidy
-go build -o reign ./cmd/reign
-```
-
-### Testing
-
-```bash
-# Start throne daemon first
+# macOS/Linux
+brew install sovereynai/tap/throne
 throne serve
 
-# Then test reign commands
-./reign status
-./reign models
-./reign chat "Hello world"
+# Windows
+scoop bucket add sovereyn https://github.com/sovereynai/scoop-bucket
+scoop install throne
 ```
+
+That's it! Throne auto-configures and connects you to the network.
+
+### Install Reign
+
+**Homebrew (macOS/Linux):**
+```bash
+brew install sovereynai/tap/reign
+```
+
+**Scoop (Windows):**
+```powershell
+scoop bucket add sovereyn https://github.com/sovereynai/scoop-bucket
+scoop install reign
+```
+
+**Or download from [Releases](https://github.com/sovereynai/reign/releases)**
+
+### Start Using AI
+
+```bash
+# Check connection
+reign status
+
+# See available models
+reign models network
+
+# Chat with AI
+reign chat "Explain machine learning in simple terms"
+```
+
+## 📖 Common Commands
+
+### Chat with AI
+
+```bash
+# Simple chat
+reign chat "Explain quantum computing in one sentence"
+
+# Specify a model
+reign chat -m llama3.2:latest "Write a haiku about recursion"
+```
+
+### Browse Models
+
+```bash
+# See local models
+reign models
+
+# See all models across the network
+reign models network
+```
+
+### Monitor Usage
+
+```bash
+# Developer dashboard - see your credits and usage
+reign dev status
+
+# Node operator dashboard - see your earnings
+reign node status
+```
+
+The dashboard shows you what matters:
+- **For Developers:** Credit balance, burn rate, per-model costs, latency insights
+- **For Operators:** Earnings, hardware utilization, model performance
+
+## 🛠️ For Developers
+
+Reign is open source and built with Go. Want to extend it or build your own tools?
+
+```bash
+# Clone and build
+git clone https://github.com/sovereynai/reign.git
+cd reign
+go build -o reign ./cmd/reign
+```
+
+Reign communicates with the Throne daemon over HTTP, making it easy to understand and extend.
 
 ## 🌍 Contributing
 
-Reign is open source! We welcome contributions:
+We welcome contributions! Fork the repo, create a feature branch, and submit a pull request.
 
-1. Fork the repo
-2. Create a feature branch
-3. Submit a pull request
-
-**Ideas for contributions:**
-- Streaming chat output with real-time progress
-- Session history and conversation replay
+**Popular contribution ideas:**
+- Streaming chat output
+- Session history
 - Interactive model playground
-- Hardware monitoring enhancements
 - Shell completions
-- Config file support
 - Export metrics to JSON/CSV
 
-## 📚 API Reference
+## 📚 Documentation
 
-Reign communicates with throne's HTTP API:
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/healthz` | GET | Health check |
-| `/version` | GET | Version info |
-| `/chat` | POST | Chat completion |
-| `/generate` | POST | Text generation |
-| `/ollama/models` | GET | List models |
-| `/stats/dashboard` | GET | Comprehensive dashboard statistics |
-
-See throne's API documentation for full details.
-
-## 🔗 Links
-
-- **Sovereyn Website**: https://sovereyn.ai (coming soon)
-- **Throne Daemon**: (proprietary - binary releases only)
-- **Documentation**: https://docs.sovereyn.ai (coming soon)
+- **[AI Developer Guide](https://github.com/sovereynai/ai-developer-guide)** - Get started using Sovereyn Network
+- **[Node Operator Guide](https://github.com/sovereynai/node-operator-guide)** - Run your own inference node
+- **[Architecture Docs](https://github.com/sovereynai/architecture-docs)** - Technical deep dives & design docs
 
 ## 📄 License
 
 MIT License - See LICENSE file for details
 
-## 🙏 Acknowledgments
-
-Built with:
-- [Cobra](https://github.com/spf13/cobra) - CLI framework
-- [Bubble Tea](https://github.com/charmbracelet/bubbletea) - TUI framework
-- [Lipgloss](https://github.com/charmbracelet/lipgloss) - Styling
-
 ---
 
-**Made with ❤️ by the Sovereyn community**
+👑 Rule Your AI Destiny!
